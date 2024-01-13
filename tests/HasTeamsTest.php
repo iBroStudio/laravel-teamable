@@ -76,7 +76,7 @@ it('can detach team', function () {
     expect($user->currentTeamId($team->type))->toBeNull();
 });
 
-it('can set and retrieve current team ID', function () {
+it('can handle current team ID', function () {
     $team = Team::factory()
         ->teamable(
             Teamable::factory()->create()
@@ -154,16 +154,3 @@ it('can set multiple current ID for different team', function () {
     expect($user->currentTeamId($team->type))->toBe($team->id);
     expect($user->currentTeamId($team2->type))->toBe($team2->id);
 });
-/*
-it('can set and retrieve current team ID', function () {
-    $team = Team::factory()
-        ->teamable(
-            Teamable::factory()->create()
-        )
-        ->create();
-    $user = User::factory()->create();
-    $user->currentTeamId($team->type, $team);
-
-    expect($user->currentTeamId($team->type))->toBe($team->id);
-});
- */
