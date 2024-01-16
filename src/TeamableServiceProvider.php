@@ -20,7 +20,7 @@ class TeamableServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-teamable')
-            //->hasConfigFile()
+            ->hasConfigFile()
             //->hasViews()
             ->hasMigration('create_teamable_tables');
         //->hasCommand(TeamableCommand::class);
