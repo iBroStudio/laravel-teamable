@@ -1,6 +1,5 @@
 <?php
 
-use IBroStudio\Teamable\Models\Team;
 use IBroStudio\Teamable\Tests\Support\Models\Teamable;
 use Illuminate\Support\Facades\Config;
 
@@ -16,7 +15,7 @@ it('can provide teamNameAttribute', function () {
 
     expect($teamable->teamNameAttribute())->toBe('name');
 
-    Config::set('teamable.model_name_attribute.' . Teamable::class, 'other_attribute');
+    Config::set('teamable.model_name_attribute.'.Teamable::class, 'other_attribute');
 
     expect($teamable->teamNameAttribute())->toBe('other_attribute');
 });
