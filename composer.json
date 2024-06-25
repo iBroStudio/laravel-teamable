@@ -16,18 +16,19 @@
         }
     ],
     "version": "1.0.0",
+    "type": "custom-library",
     "require": {
         "php": "^8.2",
         "ibrostudio/laravel-data-repository": "^1.0",
-        "illuminate/contracts": "^10.0",
+        "illuminate/contracts": "^11.0",
         "spatie/laravel-package-tools": "^1.14.0",
         "spatie/laravel-sluggable": "^3.5"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
-        "nunomaduro/collision": "^7.8",
+        "nunomaduro/collision": "^8.0",
         "larastan/larastan": "^2.0.1",
-        "orchestra/testbench": "^8.8",
+        "orchestra/testbench": "^9.0",
         "pestphp/pest": "^2.20",
         "pestphp/pest-plugin-arch": "^2.0",
         "pestphp/pest-plugin-laravel": "^2.0",
@@ -80,6 +81,9 @@
             "aliases": {
                 "Teamable": "IBroStudio\\Teamable\\Facades\\Teamable"
             }
+        },
+        "custom-directory-installer": {
+            "directory": "packages"
         }
     },
     "minimum-stability": "dev",

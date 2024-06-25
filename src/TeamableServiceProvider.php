@@ -2,7 +2,7 @@
 
 namespace IBroStudio\Teamable;
 
-use IBroStudio\Teamable\Commands\TeamableCommand;
+use IBroStudio\Teamable\Commands\TeamableInstallCommand;
 use IBroStudio\Teamable\Models\Team;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Gate;
@@ -22,8 +22,8 @@ class TeamableServiceProvider extends PackageServiceProvider
             ->name('laravel-teamable')
             ->hasConfigFile()
             //->hasViews()
-            ->hasMigration('create_teamable_tables');
-        //->hasCommand(TeamableCommand::class);
+            ->hasMigration('create_teamable_tables')
+            ->hasCommand(TeamableInstallCommand::class);
     }
 
     public function packageBooted()

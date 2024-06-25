@@ -44,7 +44,7 @@ trait HasTeams
 
             return $team->id;
         }
-
+//dd($this);
         try {
             return $this->data_repository(
                 dataClass: CurrentTeam::class,
@@ -66,7 +66,7 @@ trait HasTeams
             ->delete();
     }
 
-    public function attachTeam(Team $team, array $pivotData = []): self|string|bool
+    public function attachTeam(Team $team, array $pivotData = []): self
     {
         /*
         if (! $this->relationLoaded($team->type->relation())) {

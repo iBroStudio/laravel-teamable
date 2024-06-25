@@ -46,6 +46,6 @@ return new class extends Migration
     {
         Schema::drop('team_invitations');
         Schema::drop('team_user');
-        Schema::drop('team_id');
+        Schema::drop('teams');
     }
 };

@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait IsTeamable
 {
+    public function initializeIsTeamable()
+    {
+        $this->with[] = 'team';
+    }
+
     public static function bootIsTeamable(): void
     {
         static::created(fn (Model $model) => $model->team()->create([
