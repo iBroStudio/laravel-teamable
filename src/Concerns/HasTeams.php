@@ -44,7 +44,7 @@ trait HasTeams
 
             return $team->id;
         }
-//dd($this);
+        //dd($this);
         try {
             return $this->data_repository(
                 dataClass: CurrentTeam::class,

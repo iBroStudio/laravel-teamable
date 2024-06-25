@@ -2,6 +2,4 @@
 
 namespace IBroStudio\Teamable;
 
-class Teamable
-{
-}
+class Teamable {}

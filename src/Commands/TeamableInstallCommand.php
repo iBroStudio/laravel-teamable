@@ -14,8 +14,8 @@ class TeamableInstallCommand extends Command
     {
         $this->comment('Installing Teamable package...');
 
-        $this->callSilently("vendor:publish", [
-            '--tag' => "teamable-migrations",
+        $this->callSilently('vendor:publish', [
+            '--tag' => 'teamable-migrations',
         ]);
 
         $this->call('migrate');
