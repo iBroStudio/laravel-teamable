@@ -23,7 +23,7 @@ final class CurrentTeam extends ValueObject
             : TeamType::make($teamType);
     }
 
-    public function value(): string
+    public function value(): int|array
     {
         return $this->id;
     }

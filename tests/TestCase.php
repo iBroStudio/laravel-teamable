@@ -18,7 +18,7 @@ class TestCase extends Orchestra
         );
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             DataRepositoryServiceProvider::class,
@@ -26,7 +26,7 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
 
@@ -36,7 +36,7 @@ class TestCase extends Orchestra
         $migration = include __DIR__.'/../vendor/ibrostudio/laravel-data-repository/database/migrations/create_data_repository_table.php.stub';
         $migration->up();
 
-        $migration = include __DIR__.'/../database/migrations/create_teamable_tables.php.stub';
-        $migration->up();
+        //$migration = include __DIR__.'/../database/migrations/create_teamable_tables.php.stub';
+        //$migration->up();
     }
 }

@@ -55,10 +55,11 @@ it('can attach team', function () {
         )
         ->create();
     $user = User::factory()->create();
+
     $user->attachTeam($team);
 
     expect($user->teams()->first()->is($team))->toBeTrue();
-    expect($user->currentTeamId($team->type))->toBe($team->id);
+    expect($user->getCurrentTeamId($team->type))->toBe($team->id);
 });
 
 it('can detach team', function () {
@@ -73,7 +74,7 @@ it('can detach team', function () {
     $user->detachTeam($team);
 
     expect($user->teams)->toHaveCount(0);
-    expect($user->currentTeamId($team->type))->toBeNull();
+    expect($user->getCurrentTeamId($team->type))->toBeNull();
 });
 
 it('can handle current team ID', function () {
@@ -83,9 +84,9 @@ it('can handle current team ID', function () {
         )
         ->create();
     $user = User::factory()->create();
-    $user->currentTeamId($team->type, $team);
+    $user->setCurrentTeam($team);
 
-    expect($user->currentTeamId($team->type))->toBe($team->id);
+    expect($user->getCurrentTeamId($team->type))->toBe($team->id);
 });
 
 it('can clear current team ID', function () {
@@ -95,10 +96,10 @@ it('can clear current team ID', function () {
         )
         ->create();
     $user = User::factory()->create();
-    $user->currentTeamId($team->type, $team);
+    $user->setCurrentTeam($team);
     $user->clearCurrentTeamId($team->type);
 
-    expect($user->currentTeamId($team->type))->toBeNull();
+    expect($user->getCurrentTeamId($team->type))->toBeNull();
 });
 
 it('can switch team', function () {
@@ -117,11 +118,11 @@ it('can switch team', function () {
     $user->attachTeam($team);
     $user->attachTeam($team2);
 
-    expect($user->currentTeamId($team->type))->toBe($team->id);
+    expect($user->getCurrentTeamId($team->type))->toBe($team->id);
 
-    $user->switchTeam($team2);
+    $user->switchToTeam($team2);
 
-    expect($user->currentTeamId($team->type))->toBe($team2->id);
+    expect($user->getCurrentTeamId($team->type))->toBe($team2->id);
 });
 
 it('disallows non member to switch to a team', function () {
@@ -132,7 +133,7 @@ it('disallows non member to switch to a team', function () {
         )
         ->create();
     $user = User::factory()->create();
-    $user->switchTeam($team);
+    $user->switchToTeam($team);
 })->throws(AuthorizationException::class);
 
 it('can set multiple current ID for different team', function () {
@@ -151,6 +152,6 @@ it('can set multiple current ID for different team', function () {
     $user->attachTeam($team);
     $user->attachTeam($team2);
 
-    expect($user->currentTeamId($team->type))->toBe($team->id);
-    expect($user->currentTeamId($team2->type))->toBe($team2->id);
+    expect($user->getCurrentTeamId($team->type))->toBe($team->id);
+    expect($user->getCurrentTeamId($team2->type))->toBe($team2->id);
 });

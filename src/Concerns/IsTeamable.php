@@ -15,13 +15,15 @@ trait IsTeamable
 
     public static function bootIsTeamable(): void
     {
-        static::created(fn (Model $model) => $model->team()->create([
-            'name' => $model->{$model->teamNameAttribute()},
-        ])
-        );
+        static::created(function (Model $model) {
+            if (config('teamable.auto.create')) {
+                // @phpstan-ignore-next-line
+                $model->createTeam();
+            }
+        });
 
-        static::deleting(fn (Model $model) => $model->team->delete()
-        );
+        // @phpstan-ignore-next-line
+        static::deleting(fn (Model $model) => $model->team->delete());
     }
 
     public function team(): MorphOne
@@ -32,5 +34,15 @@ trait IsTeamable
     public function teamNameAttribute(): string
     {
         return config('teamable.model_name_attribute.'.self::class, config('teamable.model_name_attribute.default'));
+    }
+
+    public function createTeam(): self
+    {
+        $this->team()->create([
+            // @phpstan-ignore-next-line
+            'name' => $this->{$this->teamNameAttribute()},
+        ]);
+
+        return $this;
     }
 }

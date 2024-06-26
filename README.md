@@ -1,60 +1,136 @@
-# This is my package laravel-teamable
+# Laravel Teamable
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/ibrostudio/laravel-teamable.svg?style=flat-square)](https://packagist.org/packages/ibrostudio/laravel-teamable)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/ibrostudio/laravel-teamable/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ibrostudio/laravel-teamable/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/ibrostudio/laravel-teamable/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/ibrostudio/laravel-teamable/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/ibrostudio/laravel-teamable.svg?style=flat-square)](https://packagist.org/packages/ibrostudio/laravel-teamable)
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-teamable.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-teamable)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+Add team properties to Eloquent models.
 
 ## Installation
 
-You can install the package via composer:
+Install the package via composer:
 
 ```bash
 composer require ibrostudio/laravel-teamable
 ```
 
-You can publish and run the migrations with:
+Then run the installer:
 
 ```bash
-php artisan vendor:publish --tag="laravel-teamable-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="laravel-teamable-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-teamable-views"
+php artisan data-repository:install
 ```
 
 ## Usage
 
+### Configuration
+
+Add the trait `IBroStudio\Teamable\Concerns\IsTeamable` and the interface `\IBroStudio\Teamable\Contracts\Teamable` to the Eloquent model which must be a team.
+
+**You can define many models as a team according to your needs.**
+
 ```php
-$teamable = new IBroStudio\Teamable();
-echo $teamable->echoPhrase('Hello, IBroStudio!');
+namespace App\Models;
+
+use IBroStudio\Teamable\Concerns\IsTeamable;
+use Illuminate\Database\Eloquent\Model;
+
+class Company extends Model implements \IBroStudio\Teamable\Contracts\Teamable
+{
+    use IsTeamable;
+}
 ```
+
+Add the trait `IBroStudio\Teamable\Concerns\HasTeams` to the Eloquent model that will define member of the team.
+
+```php
+namespace App\Models;
+
+use IBroStudio\Teamable\Concerns\HasTeams;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable
+{
+    use HasTeams;
+}
+```
+
+### Creating team
+
+When you create a model that has the `IBroStudio\Teamable\Concerns\IsTeamable` trait, a `IBroStudio\Teamable\Models\Team` model is automatically created using the model's property defined in the `teamable.php` config file as the team name.
+
+The default model property used is `name`. If your model does not have name, you can set another property to use in the `teamable.php` configuration file: 
+
+```php
+'model_name_attribute' => [
+    'default' => 'name',
+    Company::class => 'company_name'
+],
+```
+
+You can disable automatic team creation by setting `auto.create` to false in the `teamable.php` configuration file.
+
+```php
+$company = Company::create([
+    'name' => 'iBroStudio',
+]);
+
+$company->team; // This give access to the team model through a MorphOne relationship
+```
+
+To add team to an existing model:
+
+```php
+$company->createTeam();
+
+$company->team; // This give access to the team model
+```
+
+### Add member to a team
+
+```php
+$user->attachTeam($company->team);
+```
+
+A user can be a member of multiple teams and different team types:
+
+```php
+$user->attachTeam($company_1->team);
+$user->attachTeam($company_2->team);
+
+$department = Department::create([
+    'name' => 'Development',
+]);
+$user->attachTeam($department->team);
+```
+
+### Current team ID
+
+For ease of use, a **current team ID** property is stored in a data repository for each team type.
+
+When you add a member to a team, the value is set to that team's ID.
+
+You can retrieve the value with the `getCurrentTeamId(TeamType $teamType)`method.
+
+```php
+$user->getCurrentTeamId(TeamType::make(Company::class));
+// or $user->getCurrentTeamId($company_1->team->type);
+
+$user->getCurrentTeamId(TeamType::make(Department::class));
+```
+
+To change the current team ID, use the `switchToTeam` method:
+
+```php
+$user->switchToTeam($company_2->team);
+```
+
+### Remove member from a team
+
+```php
+$user->detachTeam($company->team);
+```
+
+### Deleting team
+
+Team model is automatically deleted when you delete the model that has the `IBroStudio\Teamable\Concerns\IsTeamable` trait.
+
+You can disable automatic team deletion by setting `auto.delete` to false in the `teamable.php` configuration file.
 
 ## Testing
 
@@ -65,19 +141,6 @@ composer test
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [iBroStudio](https://github.com/iBroStudio)
-- [All Contributors](../../contributors)
 
 ## License
 

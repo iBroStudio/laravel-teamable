@@ -4,6 +4,7 @@ namespace IBroStudio\Teamable\Models;
 
 use IBroStudio\Teamable\Database\Factories\TeamFactory;
 use IBroStudio\Teamable\ValueObjects\TeamType;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,11 +25,19 @@ class Team extends Model
         'slug',
     ];
 
-    public function type(): Attribute
+    /**
+     * @return Attribute<TeamType, never>
+     */
+    protected function type(): Attribute
     {
         return Attribute::make(
             get: fn (mixed $value, array $attributes) => TeamType::make($attributes['teamable_type'])
         );
+    }
+
+    public function getType(): TeamType
+    {
+        return $this->type;
     }
 
     public function teamable(): MorphTo
@@ -47,9 +56,12 @@ class Team extends Model
             ->withTimestamps();
     }
 
-    public function hasMember(Model $user): bool
+    /**
+     * @mixed Model
+     */
+    public function hasMember(Authenticatable $user): bool
     {
-        return $this->users()->where('users.id', $user->id)->first() ? true : false;
+        return (bool) $this->users()->where('users.id', $user->getAuthIdentifier())->first();
     }
 
     public function invites(): HasMany

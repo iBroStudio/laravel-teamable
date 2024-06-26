@@ -7,11 +7,15 @@ use IBroStudio\Teamable\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\IBroStudio\DataRepository\Models\DataObject>
+ */
 class TeamFactory extends Factory
 {
+    // @phpstan-ignore-next-line
     protected $model = Team::class;
 
-    public function definition()
+    public function definition(): array
     {
         return [
             'name' => fake()->company,
@@ -25,6 +29,7 @@ class TeamFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($teamable) {
             return [
+                // @phpstan-ignore-next-line
                 'teamable_id' => $teamable->id,
                 'teamable_type' => get_class($teamable),
             ];

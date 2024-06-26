@@ -1,6 +1,6 @@
 {
     "name": "ibrostudio/laravel-teamable",
-    "description": "This is my package laravel-teamable",
+    "description": "Add team properties to Eloquent models",
     "keywords": [
         "iBroStudio",
         "laravel",
@@ -15,12 +15,11 @@
             "role": "Developer"
         }
     ],
-    "version": "1.0.0",
-    "type": "custom-library",
     "require": {
         "php": "^8.2",
         "ibrostudio/laravel-data-repository": "^1.0",
         "illuminate/contracts": "^11.0",
+        "michael-rubel/laravel-value-objects": "^7.0",
         "spatie/laravel-package-tools": "^1.14.0",
         "spatie/laravel-sluggable": "^3.5"
     },
@@ -61,7 +60,7 @@
             "@composer run build",
             "@php vendor/bin/testbench serve"
         ],
-        "analyse": "vendor/bin/phpstan analyse",
+        "analyse": "vendor/bin/phpstan analyse -l 5 --memory-limit=1G config database src tests",
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
         "format": "vendor/bin/pint"
@@ -81,9 +80,6 @@
             "aliases": {
                 "Teamable": "IBroStudio\\Teamable\\Facades\\Teamable"
             }
-        },
-        "custom-directory-installer": {
-            "directory": "packages"
         }
     },
     "minimum-stability": "dev",

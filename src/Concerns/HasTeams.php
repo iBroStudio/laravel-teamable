@@ -2,17 +2,19 @@
 
 namespace IBroStudio\Teamable\Concerns;
 
+use IBroStudio\DataRepository\Concerns\HasDataRepository;
 use IBroStudio\Teamable\Models\Team;
 use IBroStudio\Teamable\ValueObjects\CurrentTeam;
 use IBroStudio\Teamable\ValueObjects\TeamType;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
 
 trait HasTeams
 {
+    use HasDataRepository;
+
     public function teams(?TeamType $type = null): BelongsToMany
     {
         return $this->belongsToMany(
@@ -21,31 +23,34 @@ trait HasTeams
             foreignPivotKey: 'user_id',
             relatedPivotKey: 'team_id'
         )
+            // @phpstan-ignore-next-line
             ->when($type, function (Builder $query, TeamType $type) {
                 $query->where('teamable_type', $type->class);
             })
             ->withTimestamps();
     }
 
-    public function currentTeamId(TeamType $teamType, ?Team $team = null): ?int
+    public function setCurrentTeam(Team $team): bool
     {
-        if ($team) {
-            $data = CurrentTeam::make(
-                id: $team->id,
-                teamType: $team->type
-            );
+        $data = CurrentTeam::make(
+            id: $team->id,
+            teamType: $team->getType()
+        );
 
-            $this->data_repository()->add(
-                data: $data,
-                valuesAttributes: [
-                    'values->teamType' => $team->type->class,
-                ]
-            );
+        $this->data_repository()->add(
+            data: $data,
+            valuesAttributes: [
+                'values->teamType' => $team->getType()->class,
+            ]
+        );
 
-            return $team->id;
-        }
-        //dd($this);
+        return true;
+    }
+
+    public function getCurrentTeamId(TeamType $teamType): ?int
+    {
         try {
+            // @phpstan-ignore-next-line
             return $this->data_repository(
                 dataClass: CurrentTeam::class,
                 valuesQuery: ['teamType' => $teamType->class]
@@ -59,6 +64,7 @@ trait HasTeams
 
     public function clearCurrentTeamId(TeamType $teamType): bool
     {
+        // @phpstan-ignore-next-line
         return $this->data_repository(
             dataClass: CurrentTeam::class,
             valuesQuery: ['teamType' => $teamType->class]
@@ -77,6 +83,7 @@ trait HasTeams
             $this->load('teams');
         }
 
+        // @phpstan-ignore-next-line
         if (! $this->teams()
             ->get()
             ->contains($team)
@@ -86,15 +93,15 @@ trait HasTeams
             //event(new UserJoinedTeam($this, $team));
 
             /*
-            if ($this->relationLoaded($team->type->relation())) {
-                $this->load($team->type->relation());
+            if ($this->relationLoaded($team->getType()->relation())) {
+                $this->load($team->getType()->relation());
             }
             */
 
             $this->load('teams');
 
-            if (is_null($this->currentTeamId($team->type))) {
-                $this->switchTeam($team);
+            if (is_null($this->getCurrentTeamId($team->type))) {
+                $this->switchToTeam($team);
             }
         }
 
@@ -107,16 +114,16 @@ trait HasTeams
 
         //event(new UserLeftTeam($this, $team));
         /*
-                if ($this->relationLoaded($team->type->relation())) {
-                    $this->load($team->type->relation());
+                if ($this->relationLoaded($team->getType()->relation())) {
+                    $this->load($team->getType()->relation());
                 }
         */
         $this->load('teams');
 
-        if ($this->teams($team->type)->count() === 0
-            || $this->currentTeamId($team->type) === $team->id
+        if ($this->teams($team->getType())->count() === 0
+            || $this->getCurrentTeamId($team->getType()) === $team->id
         ) {
-            $this->clearCurrentTeamId($team->type);
+            $this->clearCurrentTeamId($team->getType());
 
             $this->load('teams');
         }
@@ -124,7 +131,7 @@ trait HasTeams
         return $this;
     }
 
-    public function switchTeam(Team|Model|int $team): self
+    public function switchToTeam(Team|int $team): self
     {
         if (is_int($team)) {
             $team = Team::findOrFail($team);
@@ -132,7 +139,7 @@ trait HasTeams
 
         Gate::authorize('switch-team', [$team, $this]);
 
-        $this->currentTeamId($team->type, $team);
+        $this->setCurrentTeam($team);
 
         if ($this->relationLoaded('teams')) {
             $this->load('teams');

@@ -2,7 +2,6 @@
 
 namespace IBroStudio\Teamable\Tests\Support\Models;
 
-use IBroStudio\DataRepository\Concerns\HasDataRepository;
 use IBroStudio\Teamable\Concerns\HasTeams;
 use IBroStudio\Teamable\Tests\Support\Database\Factory\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +9,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasDataRepository;
     use HasFactory;
     use HasTeams;
 
